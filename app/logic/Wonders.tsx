@@ -1,4 +1,4 @@
-type Resource = 'stone'|'papyrus'|'clay'|'glass'|'wood';
+import { Resource } from "./Resource"
 
 type NumericEffectType='victoryPoints'|'takeCoins'|'removeCoins'|'shields'
 type BooleanEffectType='secondTurn'|'playDiscardedCoins'|'playDiscardedCard'|'destroyBrownCard'|'destroyGreyCard'
