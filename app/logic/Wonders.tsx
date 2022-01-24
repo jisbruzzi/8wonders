@@ -1,4 +1,4 @@
-type Resource = 'stone'|'papyrus'|'brick'|'glass'|'wood';
+type Resource = 'stone'|'papyrus'|'clay'|'glass'|'wood';
 
 type NumericEffectType='victoryPoints'|'takeCoins'|'removeCoins'|'shields'
 type BooleanEffectType='secondTurn'|'playDiscardedCoins'|'playDiscardedCard'|'destroyBrownCard'|'destroyGreyCard'
@@ -31,7 +31,7 @@ const wondersData = [
         image:'https://cardboardmountain.com/wp-content/uploads/2019/11/A2DAC138-6667-4094-AB11-24F9516D8C2E.jpg',
         cost:{
             papyrus:1,
-            brick:2,
+            clay:2,
             stone:2
         },
         effect:{
@@ -61,7 +61,7 @@ const wondersData = [
         name:"Piraeus",
         image:'https://cardboardmountain.com/wp-content/uploads/2019/11/E6CFD4BD-5B4C-4ED8-9990-CDBDB9B81D50.jpg',
         cost:{
-            brick:1,
+            clay:1,
             stone:1,
             wood:2
         },
@@ -91,7 +91,7 @@ const wondersData = [
         image:'https://cardboardmountain.com/wp-content/uploads/2019/11/F7D8143A-4E00-41BF-BC77-336E070186A2.jpg',
         cost:{
             glass:2,
-            brick:1,
+            clay:1,
             stone:1
         },
         effect:{
@@ -121,7 +121,7 @@ const wondersData = [
             wood:1
         },
         effect:{
-            produce:['wood','stone','brick'],
+            produce:['wood','stone','clay'],
             victoryPoints:4,
         }
     },{
@@ -131,7 +131,7 @@ const wondersData = [
         cost:{
             papyrus:1,
             glass:2,
-            brick:2,
+            clay:2,
         },
         effect:{
             playDiscardedCard:true,
@@ -157,7 +157,7 @@ const wondersData = [
         image:'https://cardboardmountain.com/wp-content/uploads/2019/11/57629DA8-8CEB-41DC-8EAE-F23C05354E75.jpg',
         cost:{
             papyrus:2,
-            brick:1,
+            clay:1,
             wood:1,
             stone:1
         },
@@ -172,7 +172,7 @@ const wondersData = [
         image:'https://cardboardmountain.com/wp-content/uploads/2019/11/7FE982B2-9F14-4A55-B494-DE862A3DF2CB.jpg',
         cost:{
             glass:1,
-            brick:3
+            clay:3
         },
         effect:{
             shields:2,
