@@ -51,10 +51,6 @@ export function reduce(state:GameState,action:GameAction):GameState{
             }
         }
         case 'chooseWonder': {
-            console.log("===========")
-            console.log("===========")
-            console.log(state)
-
             const availableWonderIDs=wonderIds.filter(wid => ![...state.wonders[1],...state.wonders[2], action.wonder].includes(wid))
             invariant(state.playerChoosingWonder !== null)
             const me = state.playerChoosingWonder;
@@ -76,17 +72,21 @@ export function reduce(state:GameState,action:GameAction):GameState{
                 }
                 throw new Error("Impossible!")
             })()
+            const endOfChosingWonders=wonders[1].length === 4 && wonders[2].length===4
+            const wondersToChoseFrom=(()=>{
+                if(endOfChosingWonders){
+                    return null;
+                }
+                if(state.wondersToChoseFrom?.length===1 || state.wondersToChoseFrom===null){
+                    return sample(availableWonderIDs,4,state.randomSeed)
+                }
+                return state.wondersToChoseFrom?.filter(wid=>wid!==action.wonder);
+            })()
             return {
                 randomSeed:state.randomSeed,
-                playerChoosingWonder:other,
+                playerChoosingWonder:endOfChosingWonders?null:other,
                 wonders,
-                wondersToChoseFrom:(
-                    state.wondersToChoseFrom?.length===1 || 
-                    state.wondersToChoseFrom===null
-                )?
-                    sample(availableWonderIDs,4,state.randomSeed)
-                :
-                    state.wondersToChoseFrom?.filter(wid=>wid!==action.wonder)
+                wondersToChoseFrom
             }
         }
     }
