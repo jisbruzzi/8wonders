@@ -1,3 +1,5 @@
+import { Form } from "remix";
+
 export default function Index() {
   return (
     <div className="m-8">
@@ -6,7 +8,10 @@ export default function Index() {
         <p>A game that is not familiar at all to you.</p>
       </div>
       <div>
-
+        <Form action="/start" method="post">
+          <input name="seed" type="number" defaultValue="10"/>
+          <input type="submit" value="Empezar" className="p-2 m-2 bg-red-200 rounded-sm"/>
+        </Form>
       </div>
     </div>
   );

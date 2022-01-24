@@ -3,7 +3,7 @@ module.exports = {
     theme: {
       extend: {},
     },
-    plugins: [],
+    plugins: [require('@tailwindcss/forms'),],
     mode: "jit",
     purge: ["./app/**/*.{ts,tsx}"],
   }
