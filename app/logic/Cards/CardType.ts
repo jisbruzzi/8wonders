@@ -1,4 +1,5 @@
 import { Resource } from "../Resource"
+import { CardName } from "./CardNameType"
 
 type Science='A'|'O'|'I'|'smasher'|'pencil'|'Q'
 type Cost=Partial<Record<Resource|'coin',number>>
@@ -21,7 +22,7 @@ type Effect=Partial<
     }
 >
 export type Card = {
-    name:string,
+    name:CardName,
     type:Color,
     cost:Cost,
     effect:Effect,

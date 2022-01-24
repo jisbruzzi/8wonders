@@ -1,6 +1,4 @@
-import { Card } from "./type";
-
-export const Guilds:readonly Card[]=[
+export const Guilds=[
     {
         name:'Merchants Guild',
         type:'purple',

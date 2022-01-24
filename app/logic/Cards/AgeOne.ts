@@ -1,6 +1,4 @@
-import { Card } from "./type";
-
-export const AgeOne:readonly Card[] = [
+export const AgeOne = [
     {
         name:'Lumber Yard',
         type:'brown',
