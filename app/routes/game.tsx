@@ -1,3 +1,4 @@
+import React, { ReactNode } from "react";
 import { ActionFunction, Form, LoaderFunction, redirect, useSearchParams } from "remix"
 import invariant from "tiny-invariant";
 import Submit from "~/components/Submit";
@@ -23,14 +24,13 @@ function useGameStateSearchUrl(url:string):string{
 function WonderCard({wonder}:{wonder:Wonder}){
     const chooseWonderLink = useGameStateSearchUrl("/chooseWonder")
 
-    const { playerChoosingWonder } = useGameState();
-    invariant(playerChoosingWonder!==null)
+    const { player } = useGameState();
 
     return <div className="p-4">
         <WonderImage wonder={wonder}/>
         <Form className="flex flex-row justify-center" action={chooseWonderLink} method="post">
             <input type="hidden" value={wonder.id} name="wonder"/>
-            <Submit player={playerChoosingWonder} text={"Choose"}/>
+            <Submit player={player} text={"Choose"}/>
         </Form>
     </div>
 }
@@ -59,10 +59,10 @@ function ChosenWondersList(){
     </div>
 }
 
-export default function Game(){
+function WonderSelection(){
     const { wondersToChoseFrom } = useGameState();
-    return <div className="p-4">
-        <h1 className="text-4xl text-center">
+    return <>
+    <h1 className="text-4xl text-center">
             Selecting the wonders
         </h1>
         <div className="flex flex-row flex-wrap justify-center">
@@ -70,6 +70,37 @@ export default function Game(){
                 return wonder && <WonderCard wonder={wonder} key={wonder.id}/>
             })}
         </div>
+    </>
+}
+
+function DeckLayout({age,children}:{age:1|2|3,children:ReactNode[]}){
+    return <div className="flex flex-row">
+        {children}
+    </div>
+}
+
+function GamePlay(){
+    const { age, decks } = useGameState();
+    invariant(age!==null,"age should not be null")
+    const deck = decks[age];
+    return <div>
+        <h1 className="text-6xl">Choose a card</h1>
+        <DeckLayout age={age}>
+        {deck.map(card=>(card?<div>{card.name}</div>:"nope"))}
+    </DeckLayout>
+    </div>
+
+}
+
+export default function Game(){
+    const { wondersToChoseFrom } = useGameState();
+    return <div className="p-4">
+        {
+            (wondersToChoseFrom===null)?
+            <GamePlay/>
+            :
+            <WonderSelection/>
+        }
         <ChosenWondersList/>
     </div>
 }

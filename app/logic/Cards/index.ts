@@ -5,7 +5,7 @@ import { Guilds } from "./Guilds";
 import { Card } from "./CardType";
 export type { CardName, assertIsCardName } from "./CardNameType";
 
-export const AgeOneDeck = AgeOne as readonly Card[];
-export const AgeTwoDeck = AgeTwo as readonly Card[];
-export const AgeThreeDeck = AgeThree as readonly Card[];
-export const GuildsDeck = Guilds as readonly Card[];
+export const ageOneDeck = AgeOne as readonly Card[];
+export const ageTwoDeck = AgeTwo as readonly Card[];
+export const ageThreeDeck = AgeThree as readonly Card[];
+export const guildsDeck = Guilds as readonly Card[];
