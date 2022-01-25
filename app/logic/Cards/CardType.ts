@@ -1,23 +1,25 @@
 import { Resource } from "../Resource"
 import { CardName } from "./CardNameType"
 
-type Science='A'|'O'|'I'|'smasher'|'pencil'|'Q'
+export type Science='A'|'O'|'I'|'smasher'|'pencil'|'Q'
 type Cost=Partial<Record<Resource|'coin',number>>
 type Color='red'|'blue'|'brown'|'gray'|'green'|'yellow'|'purple'
-type UnlockSymbol='jar'|'barrel'|'mask'|'temple'|'sun'|'water'|'column'|'moon'|'target'|'soldier'|'horse'|'sword'|'tower'|'music'|'cog'|'book'|'lamp'
+export type UnlockSymbol='jar'|'barrel'|'mask'|'temple'|'sun'|'water'|'column'|'moon'|'target'|'soldier'|'horse'|'sword'|'tower'|'music'|'cog'|'book'|'lamp'
 
-type Effect=Partial<
+export interface ComplexEffect{
+    selector:(Color|'3coins'|'wonders')[],
+    over:'me'|'playerWithMost',
+    coinsNow:number,
+    victoryPointsLater:number
+}
+
+export type Effect=Partial<
     Record<Resource|'coin',number> & 
     Record<'victoryPoints'|'shields',number> & {
         produceOneOf:readonly Resource[],
         tradeOne:readonly Resource[],
         science:Science,
-        complex:{
-            selector:(Color|'3coins'|'wonders')[],
-            over:'me'|'playerWithMost',
-            coinsNow:number,
-            victoryPointsLater:number
-        },
+        complex:ComplexEffect,
         symbol:UnlockSymbol
     }
 >

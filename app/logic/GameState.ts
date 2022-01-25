@@ -1,6 +1,5 @@
 import invariant from "tiny-invariant"
-import { ageOneDeck, ageThreeDeck, ageTwoDeck, guildsDeck } from "./Cards"
-import { Card } from "./Cards/CardType"
+import { ageOneDeck, ageThreeDeck, ageTwoDeck, CardName, guildsDeck } from "./Cards"
 import { WonderId, wonders } from "./Wonders"
 
 type Player = 1|2
@@ -11,7 +10,7 @@ export interface GameState{
     wondersToChoseFrom:WonderId[]|null,
     player:Player,
     age:Age|null,
-    decks:Record<Age,(Card|null)[]>
+    decks:Record<Age,(CardName|null)[]>
 }
 export type GameAction={
     type:'start',
@@ -72,9 +71,9 @@ export function reduce(state:GameState,action:GameAction):GameState{
                 player:1,
                 age:null,
                 decks:{
-                    1:sampleRemove(ageOneDeck,3),
-                    2:sampleRemove(ageTwoDeck,3),
-                    3:shuffle(sampleRemove(ageThreeDeck,3),sample(guildsDeck,3))
+                    1:sampleRemove(ageOneDeck,3).map(c=>c.name),
+                    2:sampleRemove(ageTwoDeck,3).map(c=>c.name),
+                    3:shuffle(sampleRemove(ageThreeDeck,3),sample(guildsDeck,3)).map(c=>c.name)
                 }
             }
         }
@@ -116,7 +115,7 @@ export function reduce(state:GameState,action:GameAction):GameState{
                 player:other,
                 wonders,
                 wondersToChoseFrom,
-                age:null,
+                age:endOfChosingWonders?1:null,
                 decks:state.decks
             }
         }

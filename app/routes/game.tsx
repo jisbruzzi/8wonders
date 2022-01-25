@@ -3,6 +3,8 @@ import { ActionFunction, Form, LoaderFunction, redirect, useSearchParams } from 
 import invariant from "tiny-invariant";
 import Submit from "~/components/Submit";
 import WonderImage from "~/components/WonderImage";
+import { ageOneDeck, ageThreeDeck, ageTwoDeck, guildsDeck } from "~/logic/Cards";
+import { Effect } from "~/logic/Cards/CardType";
 import { GameState } from "~/logic/GameState"
 import { Wonder, wonders } from "~/logic/Wonders";
 
@@ -73,10 +75,78 @@ function WonderSelection(){
     </>
 }
 
+function sizesAndBeginnings(age:1|2|3){
+    switch(age){
+        case 1:{
+            const sizes=[2,3,4,5,6]
+            const begginings=[5,4,3,2,1]
+            return {
+                sizes,
+                begginings
+            }
+        }
+        case 2:{
+            const sizes=[2,3,4,5,6]
+            const begginings=[5,4,3,2,1]
+            return {
+                sizes,
+                begginings
+            }
+        }
+        case 3:{
+            const sizes=[2,3,4,5,6]
+            const begginings=[5,4,3,2,1]
+            return {
+                sizes,
+                begginings
+            }
+        }
+    }
+
+}
 function DeckLayout({age,children}:{age:1|2|3,children:ReactNode[]}){
-    return <div className="flex flex-row">
-        {children}
+    const { sizes, begginings } = sizesAndBeginnings(age);
+    function sum(a:number[]){
+        return a.reduce((a,b)=>a+b,0)
+    }
+    function childrenInRow(row:number){
+        return children.slice(
+            sum(sizes.slice(0,row)), 
+            sum(sizes.slice(0,row))+sizes[row]
+        )
+    }
+    return <div className="grid grid-rows-4 my-6">
+        {sizes.map((_,i)=><div 
+            className="grid grid-cols-12 gap-4 -my-2"
+            >
+            {childrenInRow(i).map((child,index)=>
+                <div className="col-span-2" style={{
+                    gridColumnStart:index===0?begginings[i]:'auto'
+                }}>{child}</div>
+            )}
+        </div>)}
+        
     </div>
+}
+function Card({name}:{name:string}){
+    const card = [...ageOneDeck, ...ageTwoDeck, ...ageThreeDeck, ...guildsDeck].find(c=>c.name===name)
+    invariant(card,"A card with this name mus exist")
+    const { cost, effect, type, unlockedBy} = card;
+    return <a href={`/cards/${name}`} className="hover:underline"><div className={`${{
+        'blue':'bg-blue-200',
+        'brown':'bg-amber-600',
+        'yellow':'bg-yellow-300',
+        'gray':'bg-gray-400',
+        'green':'bg-green-300',
+        'purple':'bg-purple-400',
+        'red':'bg-red-400'
+    }[type]} text-xs text-center h-24 p-1 rounded-sm shadow-md shadow-gray-400`}>
+        <div className="my-2 font-bold">
+            {name}
+        </div>
+        <EffectGlyphs effect={effect} />
+    </div>
+    </a>
 }
 
 function GamePlay(){
@@ -84,10 +154,18 @@ function GamePlay(){
     invariant(age!==null,"age should not be null")
     const deck = decks[age];
     return <div>
-        <h1 className="text-6xl">Choose a card</h1>
-        <DeckLayout age={age}>
-        {deck.map(card=>(card?<div>{card.name}</div>:"nope"))}
-    </DeckLayout>
+        <h1 className="text-4xl text-center">Choose a card</h1>
+        <div className="p-2">
+
+            <DeckLayout age={age}>
+                {deck.map(cardName=>(
+                    cardName?
+                    <Card name={cardName}/>
+                    :
+                    "nope"
+                ))}
+            </DeckLayout>
+        </div>
     </div>
 
 }
