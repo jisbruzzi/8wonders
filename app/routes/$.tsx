@@ -29,6 +29,16 @@ function getAction(actionType:string,data:FormData):GameAction{
                 type:'chooseWonder',
                 wonder
             }
+        case 'build':
+            return {
+                type:'build',
+                card:getOrFail("card",data)
+            }
+        case 'discard':
+            return {
+                type:'discard',
+                card:getOrFail("card",data)
+            }
         default:
             throw new Error("Unknown game action");
     }

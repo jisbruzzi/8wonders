@@ -3,37 +3,18 @@ import { ActionFunction, Form, LoaderFunction, redirect, useSearchParams } from 
 import invariant from "tiny-invariant";
 import Submit from "~/components/Submit";
 import WonderImage from "~/components/WonderImage";
+import { useGameState, useGameStateSearchUrl } from "~/hooks";
 import { ageOneDeck, ageThreeDeck, ageTwoDeck, guildsDeck } from "~/logic/Cards";
-import { Effect } from "~/logic/Cards/CardType";
-import { GameState } from "~/logic/GameState"
-import { extractEffects } from "~/logic/SingleEffect";
 import { Wonder, wonders } from "~/logic/Wonders";
-
-function useGameStateText():string {
-    let [searchParams] = useSearchParams();
-    const s = searchParams.get("state")
-    invariant(s!==null,"The state must be included in the url!")
-    return s;
-}
-function useGameState():GameState{
-    const s = useGameStateText();
-    return JSON.parse(s);
-}
-function useGameStateSearchUrl(url:string):string{
-    const s = useGameStateText();
-    return `${url}?state=${s}`
-}
 
 function WonderCard({wonder}:{wonder:Wonder}){
     const chooseWonderLink = useGameStateSearchUrl("/chooseWonder")
-
-    const { player } = useGameState();
 
     return <div className="p-4">
         <WonderImage wonder={wonder}/>
         <Form className="flex flex-row justify-center" action={chooseWonderLink} method="post">
             <input type="hidden" value={wonder.id} name="wonder"/>
-            <Submit player={player} text={"Choose"}/>
+            <Submit text="Choose"/>
         </Form>
     </div>
 }
@@ -77,13 +58,15 @@ function WonderSelection(){
 }
 
 function sizesAndBeginnings(age:1|2|3){
+    const zIndexes=[1,2,3,4,5]
     switch(age){
         case 1:{
             const sizes=[2,3,4,5,6]
             const begginings=[5,4,3,2,1]
             return {
                 sizes,
-                begginings
+                begginings,
+                zIndexes
             }
         }
         case 2:{
@@ -91,7 +74,8 @@ function sizesAndBeginnings(age:1|2|3){
             const begginings=[5,4,3,2,1]
             return {
                 sizes,
-                begginings
+                begginings,
+                zIndexes
             }
         }
         case 3:{
@@ -99,14 +83,15 @@ function sizesAndBeginnings(age:1|2|3){
             const begginings=[5,4,3,2,1]
             return {
                 sizes,
-                begginings
+                begginings,
+                zIndexes
             }
         }
     }
 
 }
 function DeckLayout({age,children}:{age:1|2|3,children:ReactNode[]}){
-    const { sizes, begginings } = sizesAndBeginnings(age);
+    const { sizes, begginings, zIndexes } = sizesAndBeginnings(age);
     function sum(a:number[]){
         return a.reduce((a,b)=>a+b,0)
     }
@@ -122,48 +107,62 @@ function DeckLayout({age,children}:{age:1|2|3,children:ReactNode[]}){
             >
             {childrenInRow(i).map((child,index)=>
                 <div className="col-span-2" style={{
-                    gridColumnStart:index===0?begginings[i]:'auto'
+                    gridColumnStart:index===0?begginings[i]:'auto',
+                    zIndex:zIndexes[i]
                 }}>{child}</div>
             )}
         </div>)}
         
     </div>
 }
-function Card({name}:{name:string}){
+function Card({name, canBePlayed}:{name:string, canBePlayed:boolean}){
     const card = [...ageOneDeck, ...ageTwoDeck, ...ageThreeDeck, ...guildsDeck].find(c=>c.name===name)
     invariant(card,"A card with this name mus exist")
-    const { cost, effect, type, unlockedBy} = card;
-    return <a href={`/cards/${name}`} className="hover:underline"><div className={`${{
-        'blue':'bg-blue-200',
-        'brown':'bg-amber-600',
-        'yellow':'bg-yellow-300',
-        'gray':'bg-gray-400',
-        'green':'bg-green-300',
-        'purple':'bg-purple-400',
-        'red':'bg-red-400'
-    }[type]} text-xs text-center h-24 p-1 rounded-sm shadow-md shadow-gray-400`}>
-        <div className="my-2 font-bold">
-            {name}
-        </div>
-        {extractEffects(effect).map(effect => <EffectSymbol effect={effect}/>)}
+    const { type } = card;
+    const selectCardLink = useGameStateSearchUrl("/build")
+    const discardCardLink = useGameStateSearchUrl("/discard")
+    return <div className="relative">
+        <a href={`/cards/${name}`} className="hover:underline">
+            <div className={`${{
+                'blue':'bg-blue-200',
+                'brown':'bg-amber-600',
+                'yellow':'bg-yellow-300',
+                'gray':'bg-gray-400',
+                'green':'bg-green-300',
+                'purple':'bg-purple-400',
+                'red':'bg-red-400'
+            }[type]} text-xs text-center h-24 p-1 rounded-sm ${
+                canBePlayed?'shadow-2xl shadow-blue-500':'shadow-md shadow-gray-400'
+            }`}>
+                <div className="my-2 font-bold">
+                    {name}
+                </div>
+            </div>
+        </a>
+        {canBePlayed && <div className="absolute flex flex-row pt-4">
+            <Form action={selectCardLink} method="post">
+                <Submit text="Build" />
+                <input type="hidden" value={name} name="card"/>
+            </Form>
+            <Form action={discardCardLink} method="post">
+                <Submit text="Discard" />
+                <input type="hidden" value={name} name="card"/>
+            </Form>
+        </div>}
     </div>
-    </a>
 }
 
 function GamePlay(){
-    const { age, decks } = useGameState();
+    const { age, decks, canBePlayed } = useGameState();
     invariant(age!==null,"age should not be null")
     const deck = decks[age];
     return <div>
         <h1 className="text-4xl text-center">Choose a card</h1>
-        <div className="p-2">
-
+        <div className="p-2 pb-16">
             <DeckLayout age={age}>
-                {deck.map(cardName=>(
-                    cardName?
-                    <Card name={cardName}/>
-                    :
-                    "nope"
+                {deck.map((cardName, index)=>(
+                    cardName && 
+                    <Card name={cardName} canBePlayed={canBePlayed[index]}/>
                 ))}
             </DeckLayout>
         </div>

@@ -10,7 +10,9 @@ export interface GameState{
     wondersToChoseFrom:WonderId[]|null,
     player:Player,
     age:Age|null,
-    decks:Record<Age,(CardName|null)[]>
+    decks:Record<Age,(CardName|null)[]>,
+    canBePlayed:boolean[],
+    playersState:Record<Player,{buildings:CardName[],coins:number}>
 }
 export type GameAction={
     type:'start',
@@ -18,6 +20,12 @@ export type GameAction={
 }|{
     type:'chooseWonder',
     wonder:WonderId 
+}|{
+    type:'build',
+    card:CardName
+}|{
+    type:'discard',
+    card:CardName
 }
 
 function randomizers<T>(randomSeed:number){
@@ -59,6 +67,30 @@ export function assertIsWonderId(str:string):asserts str is WonderId{
         throw new Error("noooo")
     }
 }
+
+function getNextAge(age:Age){
+    switch(age){
+        case 1: return 2;
+        case 2: return 3;
+        case 3: return null
+    }
+}
+
+function stateAfterPickingUpCard(state:GameState,card:CardName):GameState{
+    invariant(state.age!==null,"Age must not be null")
+    const newDeckForThisAge=state.decks[state.age].map(c=>c===card?null:c);
+    const age=newDeckForThisAge.every(card=>card===null)?getNextAge(state.age):state.age
+    const decks={
+        ...state.decks,
+        [state.age]:newDeckForThisAge
+    }
+    return {
+        ...state,
+        decks,
+        age,
+        player:otherPlayer(state.player)
+    }
+}
 export function reduce(state:GameState,action:GameAction):GameState{
     
     switch(action.type){
@@ -74,6 +106,11 @@ export function reduce(state:GameState,action:GameAction):GameState{
                     1:sampleRemove(ageOneDeck,3).map(c=>c.name),
                     2:sampleRemove(ageTwoDeck,3).map(c=>c.name),
                     3:shuffle(sampleRemove(ageThreeDeck,3),sample(guildsDeck,3)).map(c=>c.name)
+                },
+                canBePlayed:[],
+                playersState:{
+                    1:{buildings:[],coins:0},
+                    2:{buildings:[],coins:0},
                 }
             }
         }
@@ -116,8 +153,41 @@ export function reduce(state:GameState,action:GameAction):GameState{
                 wonders,
                 wondersToChoseFrom,
                 age:endOfChosingWonders?1:null,
-                decks:state.decks
+                decks:state.decks,
+                canBePlayed:[...new Array(14).fill(false),...new Array(6).fill(true)],
+                playersState:{
+                    1:{buildings:[],coins:0},
+                    2:{buildings:[],coins:0},
+                }
             }
+        }
+        case 'build':{
+            const playerState={
+                coins:state.playersState[state.player].coins,
+                buildings:[...state.playersState[state.player].buildings,action.card]
+            }
+            const playersState={
+                ...state.playersState,
+                [state.player]:playerState
+            }
+            return {
+                ...stateAfterPickingUpCard(state,action.card),
+                playersState
+            };
+        }
+        case 'discard':{
+            const playerState={
+                coins:state.playersState[state.player].coins+3,
+                buildings:state.playersState[state.player].buildings
+            }
+            const playersState={
+                ...state.playersState,
+                [state.player]:playerState
+            }
+            return {
+                ...stateAfterPickingUpCard(state,action.card),
+                playersState
+            };
         }
     }
 }
