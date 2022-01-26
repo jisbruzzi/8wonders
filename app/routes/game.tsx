@@ -6,6 +6,7 @@ import WonderImage from "~/components/WonderImage";
 import { ageOneDeck, ageThreeDeck, ageTwoDeck, guildsDeck } from "~/logic/Cards";
 import { Effect } from "~/logic/Cards/CardType";
 import { GameState } from "~/logic/GameState"
+import { extractEffects } from "~/logic/SingleEffect";
 import { Wonder, wonders } from "~/logic/Wonders";
 
 function useGameStateText():string {
@@ -144,7 +145,7 @@ function Card({name}:{name:string}){
         <div className="my-2 font-bold">
             {name}
         </div>
-        <EffectGlyphs effect={effect} />
+        {extractEffects(effect).map(effect => <EffectSymbol effect={effect}/>)}
     </div>
     </a>
 }

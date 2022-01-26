@@ -1,7 +1,7 @@
 import { ComplexEffect, Effect, Science, UnlockSymbol } from "./Cards/CardType";
 import { Resource } from "./Resource";
 
-type SingleEffect = 
+export type SingleEffect = 
 | {produceOneOf:readonly Resource[]}
 | {getCoin:number}
 | {victoryPoints:number}
@@ -10,8 +10,6 @@ type SingleEffect =
 | {science:Science}
 | {complex:ComplexEffect}
 | {symbol:UnlockSymbol}
-
-type KeysOfUnion<T> = T extends T ? keyof T: never;
 
 function extractResource(effect:Effect,ret:SingleEffect[],resource:Resource){
     if(effect[resource]) {
