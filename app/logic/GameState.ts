@@ -1,5 +1,6 @@
 import invariant from "tiny-invariant"
 import { ageOneDeck, ageThreeDeck, ageTwoDeck, CardName, guildsDeck } from "./Cards"
+import { intialCanBePlayedStates, layouts } from "./layouts"
 import { WonderId, wonders } from "./Wonders"
 
 type Player = 1|2
@@ -78,17 +79,25 @@ function getNextAge(age:Age){
 
 function stateAfterPickingUpCard(state:GameState,card:CardName):GameState{
     invariant(state.age!==null,"Age must not be null")
-    const newDeckForThisAge=state.decks[state.age].map(c=>c===card?null:c);
+    const currentDeck=state.decks[state.age]
+    const newDeckForThisAge=currentDeck.map(c=>c===card?null:c);
     const age=newDeckForThisAge.every(card=>card===null)?getNextAge(state.age):state.age
     const decks={
         ...state.decks,
         [state.age]:newDeckForThisAge
     }
+    const newCanBePlayed=layouts[state.age](
+        state.decks[state.age].map(c=>c!==null),
+        currentDeck.indexOf(card),
+        state.canBePlayed
+    )
+
     return {
         ...state,
         decks,
         age,
-        player:otherPlayer(state.player)
+        player:otherPlayer(state.player),
+        canBePlayed:(age===null)?[]:( (age===state.age)?newCanBePlayed:intialCanBePlayedStates[age] )
     }
 }
 export function reduce(state:GameState,action:GameAction):GameState{
@@ -154,7 +163,7 @@ export function reduce(state:GameState,action:GameAction):GameState{
                 wondersToChoseFrom,
                 age:endOfChosingWonders?1:null,
                 decks:state.decks,
-                canBePlayed:[...new Array(14).fill(false),...new Array(6).fill(true)],
+                canBePlayed:intialCanBePlayedStates[1],
                 playersState:{
                     1:{buildings:[],coins:0},
                     2:{buildings:[],coins:0},

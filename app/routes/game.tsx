@@ -70,8 +70,8 @@ function sizesAndBeginnings(age:1|2|3){
             }
         }
         case 2:{
-            const sizes=[2,3,4,5,6]
-            const begginings=[5,4,3,2,1]
+            const sizes=[6,5,4,3,2]
+            const begginings=[1,2,3,4,5]
             return {
                 sizes,
                 begginings,
@@ -79,12 +79,12 @@ function sizesAndBeginnings(age:1|2|3){
             }
         }
         case 3:{
-            const sizes=[2,3,4,5,6]
-            const begginings=[5,4,3,2,1]
+            const sizes=[2,3,4,2,4,3,2]
+            const begginings=[3,2,1,2,1,2,3]
             return {
                 sizes,
                 begginings,
-                zIndexes
+                zIndexes:[1,2,3,4,5,6,7]
             }
         }
     }
@@ -107,8 +107,10 @@ function DeckLayout({age,children}:{age:1|2|3,children:ReactNode[]}){
             >
             {childrenInRow(i).map((child,index)=>
                 <div className="col-span-2" style={{
-                    gridColumnStart:index===0?begginings[i]:'auto',
-                    zIndex:zIndexes[i]
+                    gridColumnStart:index===0?begginings[i]:(
+                        i===3 && index===1
+                    )?6:'auto',
+                    zIndex:child?zIndexes[i]:0
                 }}>{child}</div>
             )}
         </div>)}

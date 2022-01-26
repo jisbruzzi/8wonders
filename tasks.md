@@ -1,6 +1,5 @@
 # Tareas para completar este proyecto
 
-- Restringir las cartas que se levantan o descartan por posición
 - cartas boca abajo o boca arriba
 - Restringir las cartas que se levantan o descartan por recursos
 - Poder construir maravillas
@@ -13,3 +12,4 @@
 .......... más cosas!!
 # Tareas terminadas
 - Poder levantar o descartar cartas
+- Restringir las cartas que se levantan o descartan por posición
