@@ -63,8 +63,24 @@ export const layouts = {
     3:canBePlayedForLayout(layoutAgeThree),
 }
 
+function trues(n:number):boolean[]{
+    return new Array(n).fill(true)
+}
+
+function falses(n:number):boolean[]{
+    return new Array(n).fill(false)
+}
+
+const empty:boolean[]=[]
+
 export const intialCanBePlayedStates = {
-    1:[...new Array(14).fill(false),...new Array(6).fill(true)],
-    2:[...new Array(18).fill(false),...new Array(2).fill(true)],
-    3:[...new Array(18).fill(false),...new Array(2).fill(true)],
+    1:empty.concat(falses(14),trues(6)),
+    2:empty.concat(falses(18),trues(2)),
+    3:empty.concat(falses(18),trues(2))
+}
+
+export const intialFaceUpStates = {
+    1:empty.concat(trues(2),falses(3),trues(4),falses(5),trues(6)),
+    2:empty.concat(trues(6),falses(5),trues(4),falses(3),trues(2)),
+    3:empty.concat(trues(2),falses(3),trues(4),falses(2),trues(4),falses(3),trues(2)),
 }

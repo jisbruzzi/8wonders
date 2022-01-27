@@ -5,6 +5,7 @@ import Submit from "~/components/Submit";
 import WonderImage from "~/components/WonderImage";
 import { useGameState, useGameStateSearchUrl } from "~/hooks";
 import { ageOneDeck, ageThreeDeck, ageTwoDeck, guildsDeck } from "~/logic/Cards";
+import { intialFaceUpStates } from "~/logic/layouts";
 import { Wonder, wonders } from "~/logic/Wonders";
 
 function WonderCard({wonder}:{wonder:Wonder}){
@@ -108,7 +109,7 @@ function DeckLayout({age,children}:{age:1|2|3,children:ReactNode[]}){
             {childrenInRow(i).map((child,index)=>
                 <div className="col-span-2" style={{
                     gridColumnStart:index===0?begginings[i]:(
-                        i===3 && index===1
+                        i===3 && index===1 && age===3
                     )?6:'auto',
                     zIndex:child?zIndexes[i]:0
                 }}>{child}</div>
@@ -116,6 +117,10 @@ function DeckLayout({age,children}:{age:1|2|3,children:ReactNode[]}){
         </div>)}
         
     </div>
+}
+
+function FaceDownCard(){
+    return <div className="shadow-md shadow-gray-400 h-24 bg-pink-600 p-1 "/>
 }
 function Card({name, canBePlayed}:{name:string, canBePlayed:boolean}){
     const card = [...ageOneDeck, ...ageTwoDeck, ...ageThreeDeck, ...guildsDeck].find(c=>c.name===name)
@@ -164,7 +169,12 @@ function GamePlay(){
             <DeckLayout age={age}>
                 {deck.map((cardName, index)=>(
                     cardName && 
-                    <Card name={cardName} canBePlayed={canBePlayed[index]}/>
+                    (
+                        (canBePlayed[index] || intialFaceUpStates[age][index])?
+                        <Card name={cardName} canBePlayed={canBePlayed[index]}/>
+                        :
+                        <FaceDownCard/>
+                    )
                 ))}
             </DeckLayout>
         </div>

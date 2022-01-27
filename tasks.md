@@ -1,6 +1,5 @@
 # Tareas para completar este proyecto
 
-- cartas boca abajo o boca arriba
 - Restringir las cartas que se levantan o descartan por recursos
 - Poder construir maravillas
 - Ejecutar efectos de cartas que te brindan monedas al construirlas
@@ -11,5 +10,6 @@
 - Abrir la página de la maravilla al clickearla
 .......... más cosas!!
 # Tareas terminadas
+- cartas boca abajo o boca arriba
 - Poder levantar o descartar cartas
 - Restringir las cartas que se levantan o descartan por posición
