@@ -1,6 +1,8 @@
 import invariant from "tiny-invariant"
-import { ageOneDeck, ageThreeDeck, ageTwoDeck, CardName, guildsDeck } from "./Cards"
+import { ageOneDeck, ageThreeDeck, ageTwoDeck, allCards, CardName, guildsDeck } from "./Cards"
 import { intialCanBePlayedStates, layouts } from "./layouts"
+import { Resource, resources as resourcesList } from "./Resource"
+import { extractEffects, ProductionEffect } from "./SingleEffect"
 import { WonderId, wonders } from "./Wonders"
 
 type Player = 1|2
@@ -100,6 +102,47 @@ function stateAfterPickingUpCard(state:GameState,card:CardName):GameState{
         canBePlayed:(age===null)?[]:( (age===state.age)?newCanBePlayed:intialCanBePlayedStates[age] )
     }
 }
+function productionEffects(state:GameState,player:Player):ProductionEffect[] {
+    const builtCards = allCards.filter(card => state.playersState[player].buildings.includes(card.name))
+    return builtCards
+        .flatMap(card=>extractEffects(card.effect))
+        .flatMap(singleEffect => ("produceOneOf" in singleEffect)?[singleEffect]:[])
+}
+function productionsCover(resourcesNeeded:Partial<Record<Resource,number>>,productions:ProductionEffect[]):boolean{
+    console.log({resourcesNeeded,productions})
+    const someResourceIsNeded = resourcesList.some(resName => resourcesNeeded?.[resName])
+    if(!someResourceIsNeded){
+        console.log("No resources needed!")
+        return true;
+    }
+    if(productions.length===0){
+        console.log("No more productions!")
+        return false
+    }
+    const [production,...otherProductions] = productions
+    function resourcesWithOneLessOf(resource:Resource){
+        const quantity = resourcesNeeded[resource];
+        if(quantity){
+            return {
+                ...resourcesNeeded,
+                [resource]:Math.max(quantity-1,0)
+            }
+        }else{
+            return resourcesNeeded
+        }
+    }
+    return production.produceOneOf.some(producedResource => productionsCover(resourcesWithOneLessOf(producedResource),otherProductions))
+
+}
+export function canBuild(state:GameState,player:Player,cardName:CardName):boolean{
+    const card = allCards.find(c=>c.name===cardName)
+    invariant(card,"Card should be a card")
+    const coinCost = card.cost?.coin ?? 0
+    const currentCoins = state.playersState[player].coins;
+    if(coinCost > currentCoins) return false;
+    return productionsCover(card.cost,productionEffects(state,player))
+}
+
 export function reduce(state:GameState,action:GameAction):GameState{
     
     switch(action.type){

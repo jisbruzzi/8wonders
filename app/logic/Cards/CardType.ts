@@ -7,7 +7,7 @@ type Color='red'|'blue'|'brown'|'gray'|'green'|'yellow'|'purple'
 export type UnlockSymbol='jar'|'barrel'|'mask'|'temple'|'sun'|'water'|'column'|'moon'|'target'|'soldier'|'horse'|'sword'|'tower'|'music'|'cog'|'book'|'lamp'
 
 export interface ComplexEffect{
-    selector:(Color|'3coins'|'wonders')[],
+    selector:readonly (Color|'3coins'|'wonders')[],
     over:'me'|'playerWithMost',
     coinsNow:number,
     victoryPointsLater:number

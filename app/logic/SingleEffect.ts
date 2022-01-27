@@ -1,8 +1,12 @@
 import { ComplexEffect, Effect, Science, UnlockSymbol } from "./Cards/CardType";
 import { Resource } from "./Resource";
 
+export interface ProductionEffect{
+    produceOneOf:readonly Resource[]
+}
+
 export type SingleEffect = 
-| {produceOneOf:readonly Resource[]}
+| ProductionEffect
 | {getCoin:number}
 | {victoryPoints:number}
 | {shields:number}

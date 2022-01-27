@@ -5,6 +5,7 @@ import Submit from "~/components/Submit";
 import WonderImage from "~/components/WonderImage";
 import { useGameState, useGameStateSearchUrl } from "~/hooks";
 import { ageOneDeck, ageThreeDeck, ageTwoDeck, guildsDeck } from "~/logic/Cards";
+import { canBuild } from "~/logic/GameState";
 import { intialFaceUpStates } from "~/logic/layouts";
 import { Wonder, wonders } from "~/logic/Wonders";
 
@@ -128,6 +129,8 @@ function Card({name, canBePlayed}:{name:string, canBePlayed:boolean}){
     const { type } = card;
     const selectCardLink = useGameStateSearchUrl("/build")
     const discardCardLink = useGameStateSearchUrl("/discard")
+    const state = useGameState();
+    const canBeBuilt = canBuild(state,state.player,name)
     return <div className="relative">
         <a href={`/cards/${name}`} className="hover:underline">
             <div className={`${{
@@ -147,10 +150,10 @@ function Card({name, canBePlayed}:{name:string, canBePlayed:boolean}){
             </div>
         </a>
         {canBePlayed && <div className="absolute flex flex-row pt-4">
-            <Form action={selectCardLink} method="post">
+            {canBeBuilt && <Form action={selectCardLink} method="post">
                 <Submit text="Build" />
                 <input type="hidden" value={name} name="card"/>
-            </Form>
+            </Form>}
             <Form action={discardCardLink} method="post">
                 <Submit text="Discard" />
                 <input type="hidden" value={name} name="card"/>

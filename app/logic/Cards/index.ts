@@ -9,3 +9,10 @@ export const ageOneDeck = AgeOne as readonly Card[];
 export const ageTwoDeck = AgeTwo as readonly Card[];
 export const ageThreeDeck = AgeThree as readonly Card[];
 export const guildsDeck = Guilds as readonly Card[];
+
+export const allCards = [
+    ...ageOneDeck,
+    ...ageTwoDeck,
+    ...ageThreeDeck,
+    ...guildsDeck,
+] as readonly Card[]
