@@ -1,5 +1,8 @@
 # Tareas para completar este proyecto
 
+- Restringir las cartas que se levantan o descartan por recursos teniendo en cuenta trading
+- Restringir las cartas que se levantan o descartan por recursos teniendo en cuenta símbolos
+- Computar efecto de construcción por trading y teniendo en cuenta símbolos
 - galería de cartas normales y funcional desde gameplay
 - Abrir la página de la maravilla al clickearla en el juego
 - Íconos descriptivos en las cartas

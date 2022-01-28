@@ -1,7 +1,8 @@
 node_modules
 
 /.cache
-/build
+/build/assets.json
+/build/_assets
 /public/build
 .env
 
