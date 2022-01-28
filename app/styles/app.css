@@ -952,10 +952,6 @@ select {
   transition-duration: 150ms;
 }
 
-.\[x\:Resource\|\'coin\'\|\'victoryPoints\'\|\'shields\'\] {
-  x: Resource|'coin'|'victoryPoints'|'shields';
-}
-
 .hover\:bg-blue-200:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(191 219 254 / var(--tw-bg-opacity));

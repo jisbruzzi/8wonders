@@ -16,7 +16,7 @@ function WonderCard({wonder}:{wonder:Wonder}){
         <WonderImage wonder={wonder}/>
         <Form className="flex flex-row justify-center" action={chooseWonderLink} method="post">
             <input type="hidden" value={wonder.id} name="wonder"/>
-            <Submit text="Choose"/>
+            <Submit>Choose</Submit>
         </Form>
     </div>
 }
@@ -149,13 +149,14 @@ function Card({name, canBePlayed}:{name:string, canBePlayed:boolean}){
                 </div>
             </div>
         </a>
-        {canBePlayed && <div className="absolute flex flex-row pt-4">
+        {canBePlayed && <div className="absolute flex flex-row pt-4 justify-center">
             {canBeBuilt && <Form action={selectCardLink} method="post">
-                <Submit text="Build" />
+                <Submit><span className="text-xs">
+                    Build ({canBeBuilt.additionalCoins+(card.cost.coin ?? 0)})</span></Submit>
                 <input type="hidden" value={name} name="card"/>
             </Form>}
             <Form action={discardCardLink} method="post">
-                <Submit text="Discard" />
+                <Submit><span className="text-xs">Discard</span></Submit>
                 <input type="hidden" value={name} name="card"/>
             </Form>
         </div>}

@@ -1,5 +1,6 @@
 import invariant from "tiny-invariant"
 import { ageOneDeck, ageThreeDeck, ageTwoDeck, allCards, CardName, guildsDeck } from "./Cards"
+import { Card } from "./Cards/CardType"
 import { intialCanBePlayedStates, layouts } from "./layouts"
 import { Resource, resources as resourcesList } from "./Resource"
 import { extractEffects, ProductionEffect } from "./SingleEffect"
@@ -102,22 +103,27 @@ function stateAfterPickingUpCard(state:GameState,card:CardName):GameState{
         canBePlayed:(age===null)?[]:( (age===state.age)?newCanBePlayed:intialCanBePlayedStates[age] )
     }
 }
-function productionEffects(state:GameState,player:Player):ProductionEffect[] {
-    const builtCards = allCards.filter(card => state.playersState[player].buildings.includes(card.name))
-    return builtCards
+
+function cardsBuiltByPlayer(state:GameState,player:Player):Card[]{
+    return allCards.filter(card => state.playersState[player].buildings.includes(card.name));
+}
+
+function getProductionEffects(cards:Card[]):ProductionEffect[] {
+    return cards
         .flatMap(card=>extractEffects(card.effect))
         .flatMap(singleEffect => ("produceOneOf" in singleEffect)?[singleEffect]:[])
 }
-function productionsCover(resourcesNeeded:Partial<Record<Resource,number>>,productions:ProductionEffect[]):boolean{
+
+function getMinimalCostOfBuilding(resourcesNeeded:Partial<Record<Resource,number>>,tradeCosts:Record<Resource,number>, productions:ProductionEffect[]):number{
     console.log({resourcesNeeded,productions})
     const someResourceIsNeded = resourcesList.some(resName => resourcesNeeded?.[resName])
     if(!someResourceIsNeded){
         console.log("No resources needed!")
-        return true;
+        return 0;
     }
     if(productions.length===0){
         console.log("No more productions!")
-        return false
+        return resourcesList.map(resource => (resourcesNeeded?.[resource] ?? 0)*tradeCosts[resource]).reduce(( a, b ) => a + b, 0);
     }
     const [production,...otherProductions] = productions
     function resourcesWithOneLessOf(resource:Resource){
@@ -131,16 +137,35 @@ function productionsCover(resourcesNeeded:Partial<Record<Resource,number>>,produ
             return resourcesNeeded
         }
     }
-    return production.produceOneOf.some(producedResource => productionsCover(resourcesWithOneLessOf(producedResource),otherProductions))
+    const producedResources = production.produceOneOf;
+    return Math.min(...producedResources.map(r=>getMinimalCostOfBuilding(resourcesWithOneLessOf(r),tradeCosts,otherProductions)));
 
 }
-export function canBuild(state:GameState,player:Player,cardName:CardName):boolean{
+function getTradeCostsForPlayer(state:GameState,player:Player):Record<Resource,number>{
+    const initialTradeCosts:Record<Resource,number> = {
+        clay:2,
+        glass:2,
+        papyrus:2,
+        stone:2,
+        wood:2
+    }
+    const baseResourceCards = cardsBuiltByPlayer(state,otherPlayer(player)).filter(c=>c.type==='gray' || c.type==='brown')
+    const producedResources = getProductionEffects(baseResourceCards).flatMap(effect => effect.produceOneOf)
+    return producedResources.reduce((tradeCosts,resource)=>({
+        ...tradeCosts,
+        [resource]:tradeCosts[resource]+1
+    }),initialTradeCosts)
+}
+export function canBuild(state:GameState,player:Player,cardName:CardName):false|{additionalCoins:number}{
     const card = allCards.find(c=>c.name===cardName)
     invariant(card,"Card should be a card")
     const coinCost = card.cost?.coin ?? 0
     const currentCoins = state.playersState[player].coins;
-    if(coinCost > currentCoins) return false;
-    return productionsCover(card.cost,productionEffects(state,player))
+    const productions = getProductionEffects(cardsBuiltByPlayer(state,player));
+    const tradeCosts = getTradeCostsForPlayer(state,player)
+    const minimalCost = getMinimalCostOfBuilding(card.cost,tradeCosts,productions)
+    if(coinCost + minimalCost > currentCoins) return false;
+    return {additionalCoins:minimalCost}
 }
 
 export function reduce(state:GameState,action:GameAction):GameState{
