@@ -6,8 +6,14 @@
 - Abrir la página de la maravilla al clickearla en el juego
 - Íconos descriptivos en las cartas
 - mostrar las cartas que tiene un jugador y sus efectos
-- Poder construir maravillas
 - Ejecutar efectos de cartas que te brindan monedas al construirlas
+- Poder construir maravillas
+- Ejecutar efecto de construir maravillas
+- Combate: conflict pawn movil
+- Combate: efectos del conflict pawn
+- Ciencia: Implementar elección de token
+- Ciencia: Implementar efectos de los tokens
+- deployment
 - i18n
 .......... más cosas!!
 # Tareas terminadas
