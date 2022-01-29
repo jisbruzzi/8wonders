@@ -150,11 +150,11 @@ function Card({name, canBePlayed}:{name:string, canBePlayed:boolean}){
             </div>
         </a>
         {canBePlayed && <div className="absolute flex flex-row pt-4 justify-center">
-            {canBeBuilt && <Form action={selectCardLink} method="post">
-                <Submit><span className="text-xs">
-                    Build ({canBeBuilt.additionalCoins+(card.cost.coin ?? 0)})</span></Submit>
+            <Form action={selectCardLink} method="post">
+                <Submit disabled={!canBeBuilt.canBuild}><span className="text-xs">
+                    Build ({canBeBuilt.totalCoins})</span></Submit>
                 <input type="hidden" value={name} name="card"/>
-            </Form>}
+            </Form>
             <Form action={discardCardLink} method="post">
                 <Submit><span className="text-xs">Discard</span></Submit>
                 <input type="hidden" value={name} name="card"/>

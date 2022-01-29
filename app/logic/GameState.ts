@@ -156,16 +156,22 @@ function getTradeCostsForPlayer(state:GameState,player:Player):Record<Resource,n
         [resource]:tradeCosts[resource]+1
     }),initialTradeCosts)
 }
-export function canBuild(state:GameState,player:Player,cardName:CardName):false|{additionalCoins:number}{
+export function canBuild(state:GameState,player:Player,cardName:CardName):{totalCoins:number,canBuild:boolean}{
     const card = allCards.find(c=>c.name===cardName)
     invariant(card,"Card should be a card")
+    const builtCards = cardsBuiltByPlayer(state,player)
+    if(card.unlockedBy && builtCards.some(c=>c.effect.symbol === card.unlockedBy)){
+        return {totalCoins:0,canBuild:true}
+    }
     const coinCost = card.cost?.coin ?? 0
     const currentCoins = state.playersState[player].coins;
     const productions = getProductionEffects(cardsBuiltByPlayer(state,player));
     const tradeCosts = getTradeCostsForPlayer(state,player)
     const minimalCost = getMinimalCostOfBuilding(card.cost,tradeCosts,productions)
-    if(coinCost + minimalCost > currentCoins) return false;
-    return {additionalCoins:minimalCost}
+    const totalCoins = coinCost + minimalCost
+    return {
+        totalCoins, canBuild: totalCoins > currentCoins
+    }
 }
 
 export function reduce(state:GameState,action:GameAction):GameState{
