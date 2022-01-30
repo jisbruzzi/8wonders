@@ -1,5 +1,5 @@
 import invariant from "tiny-invariant"
-import { ageOneDeck, ageThreeDeck, ageTwoDeck, allCards, allCardsOrWonders, CardName, guildsDeck } from "./Cards"
+import { ageOneDeck, ageThreeDeck, ageTwoDeck, CardName, getCardOrWonder, guildsDeck } from "./Cards"
 import { Card } from "./Cards/CardType"
 import { intialCanBePlayedStates, layouts } from "./layouts"
 import { Resource, resources as resourcesList } from "./Resource"
@@ -105,7 +105,7 @@ function stateAfterPickingUpCard(state:GameState,card:CardName):GameState{
 }
 
 function cardsBuiltByPlayer(state:GameState,player:Player):Card[]{
-    return allCards.filter(card => state.playersState[player].buildings.includes(card.name));
+    return state.playersState[player].buildings.map(cn => getCardOrWonder(cn))
 }
 
 function getProductionEffects(cards:Card[]):ProductionEffect[] {
@@ -154,7 +154,7 @@ function getTradeCostsForPlayer(state:GameState,player:Player):Record<Resource,n
     }),initialTradeCosts)
 }
 export function canBuild(state:GameState,player:Player,cardName:CardName|WonderName):{totalCoins:number,canBuild:boolean}{
-    const card = allCardsOrWonders.find(c=>c.name===cardName)
+    const card = getCardOrWonder(cardName)
     invariant(card,"Card should be a card")
     const builtCards = cardsBuiltByPlayer(state,player)
     if(card.unlockedBy && builtCards.some(c=>c.effect.symbol === card.unlockedBy)){
