@@ -1,4 +1,4 @@
-import ChosenWondersList from "~/components/ChosenWondersList";
+import PlayersStatus from "~/components/PlayersStatus";
 import GamePlay from "~/components/GamePlay";
 import WonderSelection from "~/components/WonderSelection";
 import { useGameState } from "~/hooks";
@@ -12,6 +12,6 @@ export default function Game(){
             :
             <WonderSelection/>
         }
-        <ChosenWondersList/>
+        <PlayersStatus/>
     </div>
 }

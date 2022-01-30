@@ -49,7 +49,6 @@ function canBePlayed(layout:number[][],inGame:boolean[],removedIndex:number,init
     .filter(({coverers})=>coverers.includes(removedIndex))
     .filter(({coverers})=>coverers.every(coverer => !inGame[coverer] || coverer===removedIndex))
     .map(({index})=>index)
-    console.log({newTrues})
     return initialCanBePlayed.map((initialValue,index)=>initialValue || newTrues.includes(index))
 }
 

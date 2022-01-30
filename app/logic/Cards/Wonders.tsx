@@ -1,12 +1,11 @@
-import { Resource } from "./Resource"
+import { Resource } from "../Resource"
 
 type NumericEffectType='victoryPoints'|'takeCoins'|'removeCoins'|'shields'
 type BooleanEffectType='secondTurn'|'playDiscardedCoins'|'playDiscardedCard'|'destroyBrownCard'|'destroyGreyCard'
 type EffectType=NumericEffectType|BooleanEffectType|'produce'
 export interface Wonder {
-    id:WonderId
     cost:Partial<Record<Resource,number>>,
-    name:string,
+    name:WonderName,
     image:string,
     effect:Partial<Record<NumericEffectType,number> & Record<BooleanEffectType,true> & {'produce':Resource[]}>
 }
@@ -181,7 +180,7 @@ const wondersData = [
     }
 ] as const
 
-export type WonderId = (typeof wondersData[number])["id"]
+export type WonderName = (typeof wondersData[number])["name"]
 
 
 export const wonders = wondersData as readonly Wonder[]

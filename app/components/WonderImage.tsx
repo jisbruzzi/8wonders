@@ -1,4 +1,4 @@
-import { Wonder } from "~/logic/Wonders";
+import { Wonder } from "~/logic/Cards/Wonders";
 
 export default function WonderImage({wonder}:{wonder:Wonder}){
     return <div className="hover:underline decoration-slate-600">

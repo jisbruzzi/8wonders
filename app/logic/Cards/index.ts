@@ -3,6 +3,7 @@ import { AgeTwo } from "./AgeTwo";
 import { AgeThree } from "./AgeThree";
 import { Guilds } from "./Guilds";
 import { Card } from "./CardType";
+import { Wonder, wonders } from "./Wonders";
 export type { CardName, assertIsCardName } from "./CardNameType";
 
 export const ageOneDeck = AgeOne as readonly Card[];
@@ -15,4 +16,12 @@ export const allCards = [
     ...ageTwoDeck,
     ...ageThreeDeck,
     ...guildsDeck,
+] as readonly Card[]
+
+export const allCardsOrWonders = [
+    ...ageOneDeck,
+    ...ageTwoDeck,
+    ...ageThreeDeck,
+    ...guildsDeck,
+    ...wonders,
 ] as readonly Card[]

@@ -1,5 +1,5 @@
 import WonderImage from "~/components/WonderImage";
-import { wonders } from "~/logic/Wonders";
+import { wonders } from "~/logic/Cards/Wonders";
 
 export default function Wonders(){
     return <div>

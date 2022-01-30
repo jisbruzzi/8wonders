@@ -1,17 +1,17 @@
 import invariant from "tiny-invariant"
-import { ageOneDeck, ageThreeDeck, ageTwoDeck, allCards, CardName, guildsDeck } from "./Cards"
+import { ageOneDeck, ageThreeDeck, ageTwoDeck, allCards, allCardsOrWonders, CardName, guildsDeck } from "./Cards"
 import { Card } from "./Cards/CardType"
 import { intialCanBePlayedStates, layouts } from "./layouts"
 import { Resource, resources as resourcesList } from "./Resource"
 import { extractEffects, ProductionEffect } from "./SingleEffect"
-import { WonderId, wonders } from "./Wonders"
+import { WonderName, wonders } from "./Cards/Wonders"
 
 type Player = 1|2
 type Age=1|2|3
 export interface GameState{
     randomSeed:number
-    wonders:Record<Player,WonderId[]>,
-    wondersToChoseFrom:WonderId[]|null,
+    wonders:Record<Player,WonderName[]>,
+    wondersToChoseFrom:WonderName[]|null,
     player:Player,
     age:Age|null,
     decks:Record<Age,(CardName|null)[]>,
@@ -23,7 +23,7 @@ export type GameAction={
     seed:number
 }|{
     type:'chooseWonder',
-    wonder:WonderId 
+    wonder:WonderName 
 }|{
     type:'build',
     card:CardName
@@ -65,10 +65,10 @@ function otherPlayer(p:Player){
         return 1;
     }
 }
-const wonderIds = wonders.map(w=>w.id)
-export function assertIsWonderId(str:string):asserts str is WonderId{
-    if(!(wonderIds as string[]).includes(str)){
-        throw new Error("noooo")
+const wonderNames = wonders.map(w=>w.name)
+export function assertIsWonderName(str:string):asserts str is WonderName{
+    if(!(wonderNames as string[]).includes(str)){
+        throw new Error(`nooooo ${str} is not WonderName`)
     }
 }
 
@@ -115,14 +115,11 @@ function getProductionEffects(cards:Card[]):ProductionEffect[] {
 }
 
 function getMinimalCostOfBuilding(resourcesNeeded:Partial<Record<Resource,number>>,tradeCosts:Record<Resource,number>, productions:ProductionEffect[]):number{
-    console.log({resourcesNeeded,productions})
     const someResourceIsNeded = resourcesList.some(resName => resourcesNeeded?.[resName])
     if(!someResourceIsNeded){
-        console.log("No resources needed!")
         return 0;
     }
     if(productions.length===0){
-        console.log("No more productions!")
         return resourcesList.map(resource => (resourcesNeeded?.[resource] ?? 0)*tradeCosts[resource]).reduce(( a, b ) => a + b, 0);
     }
     const [production,...otherProductions] = productions
@@ -156,8 +153,8 @@ function getTradeCostsForPlayer(state:GameState,player:Player):Record<Resource,n
         [resource]:tradeCosts[resource]+1
     }),initialTradeCosts)
 }
-export function canBuild(state:GameState,player:Player,cardName:CardName):{totalCoins:number,canBuild:boolean}{
-    const card = allCards.find(c=>c.name===cardName)
+export function canBuild(state:GameState,player:Player,cardName:CardName|WonderName):{totalCoins:number,canBuild:boolean}{
+    const card = allCardsOrWonders.find(c=>c.name===cardName)
     invariant(card,"Card should be a card")
     const builtCards = cardsBuiltByPlayer(state,player)
     if(card.unlockedBy && builtCards.some(c=>c.effect.symbol === card.unlockedBy)){
@@ -170,8 +167,18 @@ export function canBuild(state:GameState,player:Player,cardName:CardName):{total
     const minimalCost = getMinimalCostOfBuilding(card.cost,tradeCosts,productions)
     const totalCoins = coinCost + minimalCost
     return {
-        totalCoins, canBuild: totalCoins > currentCoins
+        totalCoins, canBuild: totalCoins <= currentCoins
     }
+}
+
+export function getWonderMaterialCards(state:GameState):CardName[]{
+    invariant(state.age,"State age must not be null")
+    const deck = state.decks[state.age]
+    return deck.flatMap((cardName,index)=>
+        state.canBePlayed[index] 
+        &&
+        cardName!==null?[cardName]:[]
+    )
 }
 
 export function reduce(state:GameState,action:GameAction):GameState{
@@ -182,7 +189,7 @@ export function reduce(state:GameState,action:GameAction):GameState{
             return {
                 randomSeed:action.seed,
                 wonders:{1:[],2:[]},
-                wondersToChoseFrom: sample(wonderIds,4),
+                wondersToChoseFrom: sample(wonderNames,4),
                 player:1,
                 age:null,
                 decks:{
@@ -199,7 +206,7 @@ export function reduce(state:GameState,action:GameAction):GameState{
         }
         case 'chooseWonder': {
             const {sample} = randomizers(state.randomSeed);
-            const availableWonderIDs=wonderIds.filter(wid => ![...state.wonders[1],...state.wonders[2], action.wonder].includes(wid))
+            const availableWonderIDs=wonderNames.filter(wid => ![...state.wonders[1],...state.wonders[2], action.wonder].includes(wid))
             invariant(state.player !== null)
             const me = state.player;
             const other = otherPlayer(state.player)

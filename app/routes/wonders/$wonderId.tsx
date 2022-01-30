@@ -1,6 +1,6 @@
 import { useParams } from "remix";
 import invariant from "tiny-invariant";
-import { wonders } from "~/logic/Wonders";
+import { wonders } from "~/logic/Cards/Wonders";
 
 export default function WonderExplanation(){
     const {wonderId} = useParams();

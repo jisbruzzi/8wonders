@@ -1,5 +1,5 @@
 import { ActionFunction, LoaderFunction, redirect } from "remix"
-import { assertIsWonderId, GameAction, GameState, reduce } from "~/logic/GameState"
+import { assertIsWonderName, GameAction, GameState, reduce } from "~/logic/GameState"
 import invariant from 'tiny-invariant';
 
 function getState(request:Request):GameState{
@@ -24,7 +24,7 @@ function getAction(actionType:string,data:FormData):GameAction{
             }
         case 'chooseWonder':
             const wonder =getOrFail("wonder",data)
-            assertIsWonderId(wonder);
+            assertIsWonderName(wonder);
             return {
                 type:'chooseWonder',
                 wonder
