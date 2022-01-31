@@ -1,14 +1,16 @@
 import { Form } from "remix";
 import invariant from "tiny-invariant";
 import { useGameStateSearchUrl, useGameState } from "~/hooks";
-import { ageOneDeck, ageThreeDeck, ageTwoDeck, guildsDeck } from "~/logic/Cards";
+import { getCardOrWonder } from "~/logic/Cards";
+import { extractEffects } from "~/logic/SingleEffect";
 import { canBuild } from "~/logic/GameState";
 import Submit from "./Submit";
+import SingleEffectDisplay from "./SingeEffectDisplay";
 
 export default function Card({name, canBePlayed}:{name:string, canBePlayed:boolean}){
-    const card = [...ageOneDeck, ...ageTwoDeck, ...ageThreeDeck, ...guildsDeck].find(c=>c.name===name)
+    const card = getCardOrWonder(name)
     invariant(card,"A card with this name mus exist")
-    const { type } = card;
+    const { type, effect } = card;
     const selectCardLink = useGameStateSearchUrl("/build")
     const discardCardLink = useGameStateSearchUrl("/discard")
     const state = useGameState();
@@ -28,6 +30,9 @@ export default function Card({name, canBePlayed}:{name:string, canBePlayed:boole
             }`}>
                 <div className="my-2 font-bold">
                     {name}
+                </div>
+                <div className="text-3xl">
+                    {extractEffects(effect).map(effect => <SingleEffectDisplay effect={effect}/>)}
                 </div>
             </div>
         </a>
